@@ -53,7 +53,7 @@ Após executar o projeto, abra um navegador da web e acesse a URL: http://localh
     "descricao": "Pagamento Serviço S2",
     "tipo": 2,
     "valor": 58.66,
-    "id": 8 //TODO: o identificar deve ser controlado manualmente neste projeto
+    "id": 8 //TODO: o identificador deve ser controlado manualmente neste projeto
   }
 ```
 
