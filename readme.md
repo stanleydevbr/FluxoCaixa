@@ -44,5 +44,98 @@ Abra o terminal e execute o seguinte comando para clonar o repositório do GitHu
 3. Acessar a Interface Swagger:
 Após executar o projeto, abra um navegador da web e acesse a URL: http://localhost:5000/swagger/index.html
 
+4. Serviços disponíveis: 
+* [POST] - Adicionar: http://localhost:5000/FluxoCaixa 
+```json
+  {
+    "lancamento": "2023-08-09",
+    "descricao": "Pagamento Serviço S2",
+    "tipo": 2,
+    "valor": 58.66,
+    "id": 8 //TODO: o identificar deve ser controlado manualmente neste projeto
+  }
+```
+
+* [GET] - Retorna todos os lançamento: http://localhost:5000/FluxoCaixa
+```json
+[
+    {
+        "lancamento": "2023-08-08T18:02:55.548",
+        "descricao": "Venda do produto V001",
+        "tipo": "Credito",
+        "valor": 100.0,
+        "id": 1
+    },
+    {
+        "lancamento": "2023-08-08T18:02:55.548",
+        "descricao": "Venda do produto V002",
+        "tipo": "Credito",
+        "valor": 150.0,
+        "id": 2
+    },
+    {
+        "lancamento": "2023-08-08T18:02:55.548",
+        "descricao": "Pagamento do Fonecedor F002",
+        "tipo": "Debito",
+        "valor": 50.0,
+        "id": 3
+    },
+    {
+        "lancamento": "2023-08-09T00:00:00",
+        "descricao": "Pagamento do Fonecedor F003",
+        "tipo": "Debito",
+        "valor": 150.0,
+        "id": 4
+    },
+    {
+        "lancamento": "2023-08-09T00:00:00",
+        "descricao": "Venda de produto X1",
+        "tipo": "Credito",
+        "valor": 250.0,
+        "id": 5
+    },
+    {
+        "lancamento": "2023-08-09T00:00:00",
+        "descricao": "Venda de produto X2",
+        "tipo": "Credito",
+        "valor": 180.52,
+        "id": 6
+    },
+    {
+        "lancamento": "2023-08-09T00:00:00",
+        "descricao": "Venda de produto X3",
+        "tipo": "Credito",
+        "valor": 155.86,
+        "id": 7
+    },
+    {
+        "lancamento": "2023-08-09T00:00:00",
+        "descricao": "Pagamento Serviço S2",
+        "tipo": "Debito",
+        "valor": 58.66,
+        "id": 8
+    }
+]
+```
+* [GET] - Retorna um lançamento pelo identificador: http://localhost:5000/FluxoCaixa/ObterPorId?id=5
+```json
+  {
+    "lancamento": "2023-08-09T00:00:00",
+    "descricao": "Venda de produto X1",
+    "tipo": "Credito",
+    "valor": 250,
+    "id": 5
+  }
+```
+* [GET] - Resultado consolidado: http://localhost:5000/FluxoCaixa/Consolidado?data=2023-08-09
+Este endpoint permite o usuário obter o resultado consolidado de uma determinada data especificada via parametro:
+```json
+  {
+      "data": "2023-08-09T00:00:00",
+      "credito": 586.38,
+      "debito": 208.66,
+      "saldo": 377.72
+  }
+```
 ## Repositório Público
 O código-fonte do projeto está disponível no seguinte repositório público do GitHub: https://github.com/stanleydevbr/FluxoCaixa.git

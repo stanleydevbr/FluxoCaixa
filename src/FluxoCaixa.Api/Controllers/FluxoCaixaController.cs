@@ -31,7 +31,7 @@ namespace FluxoCaixa.Api.Controllers
             return CustomResponse(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("ObterPorId")]
         public IActionResult ObterPorId([FromQuery] long id)
         {
             var result = _service.ObterLancamentoPorId(id);
