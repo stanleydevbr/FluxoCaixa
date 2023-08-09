@@ -5,6 +5,7 @@ Este tutorial apresenta um projeto de demonstração que visa destacar algumas h
 O projeto foi arquitetado de acordo com a seguinte estrutura:
 
 ![alt text](desinger.png "Arquitetura")
+
 Importante: A primeira camada do desenho não esta contemplada neste projeto, foi criado apenas camada de backend, sendo possível observar as funcionalidades solicitadas atréves da API. 
 
 ## Boas Práticas
