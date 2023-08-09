@@ -1,60 +1,121 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
+using System.IO;
+using System.Reflection;
 
 namespace FluxoCaixa.Api.Configuration
 {
     public static class SwaggerConfig
     {
-        public static void AddSwaggerConfiguration(this IServiceCollection services)
+        public static IServiceCollection AddDevBrSwaggerConfiguration(this IServiceCollection services)
         {
+            var config = SwaggerSettings.GetInstance();
+            services.AddControllers();
+            services.AddApiVersioning(x =>
+            {
+                x.DefaultApiVersion = new ApiVersion(1, 0);
+                x.ReportApiVersions = true;
+                x.AssumeDefaultVersionWhenUnspecified = true;
+            });
+            services.AddVersionedApiExplorer(x =>
+            {
+                x.GroupNameFormat = "'v'VVV";
+                x.SubstituteApiVersionInUrl = true;
+            });
+            services.AddSwaggerGen().ConfigureSwaggerGen(c =>
+            {
+                c.CustomSchemaIds(type => type.FullName);
+            });
+
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigurationSwaggerOptions>();
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo()
-                {
-                    Title = "Fluxo de Caixa Diário API",
-                    Description = "Esta API faz e parte de um projeto desafio.",
-                    Contact = new OpenApiContact() { Name = "Stanley Dias Paulo", Email = "stanley.dias.paulo@gmail.com" },
-                    License = new OpenApiLicense() { Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT") }
-                });
-
+                c.OperationFilter<SwaggerDefaultValues>();
+                c.EnableAnnotations();
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "Insira o token JWT desta maneira: Bearer {seu token}",
+                    Description = config.Seguranca.Descricao,
                     Name = "Authorization",
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey
                 });
-
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
                         {
-                            Reference = new OpenApiReference
+                            Reference =  new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
                                 Id = "Bearer"
                             }
+
                         },
-                        new string[] {}
+                        Array.Empty<string>()
                     }
                 });
-
+                foreach (var filePath in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)), "*.xml"))
+                    c.IncludeXmlComments(filePath);
+                c.ExampleFilters();
             });
+
+            services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
+            services.AddFluentValidationRulesToSwagger();
+            services.AddSwaggerGenNewtonsoftSupport();
+            return services;
         }
 
-        public static void UseSwaggerConfiguration(this IApplicationBuilder app)
+        public static IApplicationBuilder UseDevBrSwaggerConfiguration(
+            this IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IApiVersionDescriptionProvider provider,
+            string applicationPrefixRoute)
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            if (env.IsDevelopment())
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHsts();
+            }
+
+
+            app.UseMvc()
+                .UseApiVersioning()
+                .UseMvcWithDefaultRoute();
+
+            //app.UseSwagger(options =>
+            //{
+            //    options.RouteTemplate = $"/swagger/{{documentName}}/swagger.json";
+            //});
+            app.UseSwagger();
+            app.UseDefaultFiles();
+            app.UseSwaggerUI(options =>
+            {
+                options.RoutePrefix = $"{applicationPrefixRoute}/swagger";
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description?.GroupName?.ToLowerInvariant());
+                }
+                options.DocExpansion(DocExpansion.List);
             });
+
+            return app;
         }
+
     }
 
 }

@@ -2,6 +2,7 @@
 using FluxoCaixa.Domain.Entities;
 using FluxoCaixa.Domain.Interfaces.Repositories;
 using FluxoCaixa.Domain.Interfaces.Services;
+using FluxoCaixa.Domain.Notifications;
 using FluxoCaixa.Domain.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -13,18 +14,25 @@ namespace FluxoCaixa.Domain.Services
     {
         private readonly ICaixaRepository _repository;
         private readonly IMapper _mapper;
+        private readonly NotificationContext _notificationContext;
 
-        public CaixaService(ICaixaRepository respository, IMapper mapper)
+        public CaixaService(ICaixaRepository respository, IMapper mapper, NotificationContext notificationContext)
         {
             _repository = respository;
             _mapper = mapper;
+            _notificationContext = notificationContext;
         }
 
         public void Gravar(CaixaViewModel model)
         {
             var caixa = _mapper.Map<Caixa>(model);
-            //TODO: Incluir verificação de validação
-            _repository.Adicionar(caixa);
+            if (!caixa.EhValido())
+                _notificationContext.AddNotifications(caixa.ValidationResult);
+
+            if (_repository.ObterPorId(model.Id) != null)
+                _repository.Atualizar(caixa);
+            else
+                _repository.Adicionar(caixa);
         }
 
         public CaixaViewModel ObterLancamentoPorId(long id)

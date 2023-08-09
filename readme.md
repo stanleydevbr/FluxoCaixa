@@ -43,10 +43,10 @@ Abra o terminal e execute o seguinte comando para clonar o repositório do GitHu
   dotnet run
 ```
 3. Acessar a Interface Swagger:
-Após executar o projeto, abra um navegador da web e acesse a URL: http://localhost:5000/swagger/index.html
+Após executar o projeto, abra um navegador da web e acesse a URL: http://localhost:5000/FluxoCaixa/swagger/index.html
 
 4. Serviços disponíveis: 
-* [POST] - Adicionar: http://localhost:5000/FluxoCaixa 
+* [POST] - Adicionar: http://localhost:5000/v1/FluxoCaixa
 ```json
   {
     "lancamento": "2023-08-09",
@@ -57,7 +57,7 @@ Após executar o projeto, abra um navegador da web e acesse a URL: http://localh
   }
 ```
 
-* [GET] - Retorna todos os lançamento: http://localhost:5000/FluxoCaixa
+* [GET] - Retorna todos os lançamento: http://localhost:5000/v1/FluxoCaixa
 ```json
 [
     {
@@ -118,7 +118,7 @@ Após executar o projeto, abra um navegador da web e acesse a URL: http://localh
     }
 ]
 ```
-* [GET] - Retorna um lançamento pelo identificador: http://localhost:5000/FluxoCaixa/ObterPorId?id=5
+* [GET] - Retorna um lançamento pelo identificador: http://localhost:5000/v1/FluxoCaixa/ObterPorId?id=5
 ```json
   {
     "lancamento": "2023-08-09T00:00:00",
@@ -128,7 +128,7 @@ Após executar o projeto, abra um navegador da web e acesse a URL: http://localh
     "id": 5
   }
 ```
-* [GET] - Resultado consolidado: http://localhost:5000/FluxoCaixa/Consolidado?data=2023-08-09
+* [GET] - Resultado consolidado: http://localhost:5000/v1/FluxoCaixa/Consolidado?data=2023-08-09
 Este endpoint permite o usuário obter o resultado consolidado de uma determinada data especificada via parametro:
 ```json
   {

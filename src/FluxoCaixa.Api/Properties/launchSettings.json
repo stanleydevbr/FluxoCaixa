@@ -20,11 +20,11 @@
     "FluxoCaixa.Api": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "swagger",
+      "launchUrl": "FluxoCaixa/swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5000/"
     }
   }
 }
