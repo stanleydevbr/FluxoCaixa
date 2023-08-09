@@ -10,7 +10,7 @@ namespace FluxoCaixa.Api.Controllers
     [Route("[controller]")]
     public class FluxoCaixaController : BaseController
     {
-        private readonly new ICaixaService _service;
+        private readonly ICaixaService _service;
 
         public FluxoCaixaController(ICaixaService service)
         {
