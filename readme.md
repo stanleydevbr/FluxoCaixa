@@ -3,6 +3,7 @@ Este tutorial apresenta um projeto de demonstração que visa destacar algumas h
 
 ## Desenho da Solução
 O projeto foi arquitetado de acordo com a seguinte estrutura:
+
 ![alt text](desinger.png "Arquitetura")
 
 ## Boas Práticas
