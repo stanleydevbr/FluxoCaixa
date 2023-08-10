@@ -29,7 +29,7 @@ namespace FluxoCaixa.Domain.Entities
                 .WithMessage("Não e possível fazer lançamento futuro");
 
             RuleFor(x => x.Tipo)
-                .IsInEnum()
+                .Must(x => (x >= EnLancamento.Credito && x <= EnLancamento.Debito))
                 .WithMessage("Valor informado inválido");
 
             ValidationResult = Validate(this);

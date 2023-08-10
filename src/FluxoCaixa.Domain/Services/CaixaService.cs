@@ -27,24 +27,33 @@ namespace FluxoCaixa.Domain.Services
         {
             var caixa = _mapper.Map<Caixa>(model);
             if (!caixa.EhValido())
+            {
                 _notificationContext.AddNotifications(caixa.ValidationResult);
-
-            if (_repository.ObterPorId(model.Id) == null)
-                _notificationContext.AddNotification(new Notification("Id", $"Não foi encontrado lançamento para o Id informado {model.Id}."));
+            }
             else
-                _repository.Atualizar(caixa);
+            {
+                if (_repository.ObterPorId(model.Id) == null)
+                    _notificationContext.AddNotification(new Notification("Id", $"Não foi encontrado lançamento para o Id informado {model.Id}."));
+                else
+                    _repository.Atualizar(caixa);
+            }
         }
 
         public void Gravar(CaixaViewModel model)
         {
             var caixa = _mapper.Map<Caixa>(model);
             if (!caixa.EhValido())
+            {
                 _notificationContext.AddNotifications(caixa.ValidationResult);
-
-            if (_repository.ObterPorId(model.Id) == null)
-                _repository.Adicionar(caixa);
+            }
             else
-                _notificationContext.AddNotification(new Notification("Id", $"O lançamento já existe para o Id informado {model.Id}."));
+            {
+                if (_repository.ObterPorId(model.Id) == null)
+                    _repository.Adicionar(caixa);
+                else
+                    _notificationContext.AddNotification(new Notification("Id", $"O lançamento já existe para o Id informado {model.Id}."));
+            }
+
         }
 
         public CaixaViewModel ObterLancamentoPorId(long id)
