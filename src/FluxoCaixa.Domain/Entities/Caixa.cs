@@ -28,9 +28,9 @@ namespace FluxoCaixa.Domain.Entities
                 .LessThan(p => DateTime.Now.AddDays(1))
                 .WithMessage("Não e possível fazer lançamento futuro");
 
-            //TODO: Validar o enumerador valores permitidos (1-Credito, 2-Debito)
-            //RuleFor(x => x.Tipo)
-            //    .
+            RuleFor(x => x.Tipo)
+                .IsInEnum()
+                .WithMessage("Valor informado inválido");
 
             ValidationResult = Validate(this);
 

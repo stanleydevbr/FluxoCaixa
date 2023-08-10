@@ -1,7 +1,5 @@
-﻿using FluentValidation.Results;
-using FluxoCaixa.Domain.Communication;
+﻿using FluxoCaixa.Domain.Notifications;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,9 +8,16 @@ namespace FluxoCaixa.Api.Controllers
     public abstract class BaseController: Controller
     {
         protected ICollection<string> Erros = new List<string>();
+        protected NotificationContext _notifications;
+
+        protected BaseController(NotificationContext notifications)
+        {
+            _notifications = notifications;
+        }
 
         protected ActionResult CustomResponse(object result = null)
         {
+
             if (OperacaoValida())
             {
                 return Ok(result);
@@ -24,59 +29,9 @@ namespace FluxoCaixa.Api.Controllers
             }));
         }
 
-        protected ActionResult CustomResponse(ModelStateDictionary modelState)
-        {
-            var erros = modelState.Values.SelectMany(e => e.Errors);
-            foreach (var erro in erros)
-            {
-                AdicionarErroProcessamento(erro.ErrorMessage);
-            }
-
-            return CustomResponse();
-        }
-
-        protected ActionResult CustomResponse(ValidationResult validationResult)
-        {
-            foreach (var erro in validationResult.Errors)
-            {
-                AdicionarErroProcessamento(erro.ErrorMessage);
-            }
-
-            return CustomResponse();
-        }
-
-        protected ActionResult CustomResponse(ResponseResult resposta)
-        {
-            ResponsePossuiErros(resposta);
-
-            return CustomResponse();
-        }
-
-        protected bool ResponsePossuiErros(ResponseResult resposta)
-        {
-            if (resposta == null || !resposta.Errors.Mensagens.Any()) return false;
-
-            foreach (var mensagem in resposta.Errors.Mensagens)
-            {
-                AdicionarErroProcessamento(mensagem);
-            }
-
-            return true;
-        }
-
         protected bool OperacaoValida()
         {
-            return !Erros.Any();
-        }
-
-        protected void AdicionarErroProcessamento(string erro)
-        {
-            Erros.Add(erro);
-        }
-
-        protected void LimparErrosProcessamento()
-        {
-            Erros.Clear();
+            return !_notifications.HasNotifications;
         }
     }
 }

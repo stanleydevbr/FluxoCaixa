@@ -8,9 +8,10 @@ namespace FluxoCaixa.Domain.Interfaces.Services
     public interface ICaixaService
     {
         public void Gravar(CaixaViewModel caixa);
+        public void Atualizar(CaixaViewModel caixa);
         public CaixaViewModel ObterLancamentoPorId(long id);
         public IEnumerable<CaixaViewModel> ObterLancamentosPorPeriodo(DateTime Inicio, DateTime Termino);
         public IEnumerable<CaixaViewModel> ObterTodosLancamentos();
-        public void RemoverLancamento(long id);
+        public void Remover(long id);
     }
 }

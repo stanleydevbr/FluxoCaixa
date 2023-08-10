@@ -1,23 +1,13 @@
 ﻿using FluentValidation.Results;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.Json.Serialization;
 
 namespace FluxoCaixa.Domain.Notifications
 {
-    public class Notification
-	{
-		public string Key { get; }
-		public string Message { get; }
 
-		public Notification(string key, string message)
-		{
-			Key = key;
-			Message = message;
-		}
-	}
-
-	public class NotificationContext
+    public class NotificationContext
 	{
 		private readonly List<Notification> _notifications;
 		public IReadOnlyCollection<Notification> Notifications => _notifications;

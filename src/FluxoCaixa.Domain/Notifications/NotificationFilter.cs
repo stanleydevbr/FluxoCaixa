@@ -24,7 +24,6 @@ namespace FluxoCaixa.Domain.Notifications
 
 				var notifications = JsonSerializer.Serialize(_notificationContext.Notifications);
 				await context.HttpContext.Response.WriteAsync(notifications);
-
 				return;
 			}
 

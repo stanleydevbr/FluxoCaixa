@@ -23,14 +23,14 @@ namespace FluxoCaixa.Infra.Data.Repositories
         public virtual TEntity Adicionar(TEntity obj)
         {
             DbSet.Add(obj);
-            Db.SaveChanges();
+            Db.Commit();
             return obj;
         }
 
         public virtual TEntity Atualizar(TEntity obj)
         {
             DbSet.Update(obj);
-            Db.SaveChanges();
+            Db.Commit();
             return obj;
         }
 
