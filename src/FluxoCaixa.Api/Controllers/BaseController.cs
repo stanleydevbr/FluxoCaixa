@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FluxoCaixa.Api.Controllers
 {
-    public abstract class BaseController: Controller
+    public abstract class BaseController : Controller
     {
         protected ICollection<string> Erros = new List<string>();
         protected NotificationContext _notifications;

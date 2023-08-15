@@ -3,7 +3,7 @@ using System;
 
 namespace FluxoCaixa.Domain.ViewModels
 {
-    public class CaixaViewModel: EntityViewModel
+    public class CaixaViewModel : EntityViewModel
     {
         public DateTime Lancamento { get; set; } = DateTime.Now;
         public string Descricao { get; set; }

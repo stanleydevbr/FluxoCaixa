@@ -2,6 +2,8 @@
 using FluxoCaixa.Domain.Interfaces.Services;
 using FluxoCaixa.Domain.Notifications;
 using FluxoCaixa.Domain.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,10 +12,12 @@ namespace FluxoCaixa.Api.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class FluxoCaixaController : BaseController
     {
         private readonly ICaixaService _service;
+        protected NotificationContext _notifications;
         public FluxoCaixaController(ICaixaService service, NotificationContext notifications) : base(notifications)
         {
             _service = service;
@@ -25,14 +29,14 @@ namespace FluxoCaixa.Api.Controllers
         public ActionResult<List<CaixaViewModel>> ObterTodos()
         {
             var result = _service.ObterTodosLancamentos();
-            return CustomResponse(result);
+            return Ok(result);
         }
 
         [HttpGet("ObterPorId")]
         public ActionResult<CaixaViewModel> ObterPorId([FromQuery] long id)
         {
             var result = _service.ObterLancamentoPorId(id);
-            return CustomResponse(result);
+            return Ok(result);
         }
 
         [HttpGet("Consolidado")]
@@ -40,7 +44,7 @@ namespace FluxoCaixa.Api.Controllers
         {
             var resultado = _service.ObterLancamentosPorPeriodo(data, data);
             var response = resultado?.ToConsolidadoAdapter(data);
-            return CustomResponse(response);
+            return Ok(response);
         }
         #endregion
 
@@ -49,7 +53,7 @@ namespace FluxoCaixa.Api.Controllers
         public IActionResult Adicionar([FromBody] CaixaViewModel caixa)
         {
             _service.Gravar(caixa);
-            return CustomResponse("Lançamento adicionando com sucesso!");
+            return Ok("Lançamento adicionando com sucesso!");
         }
         #endregion
 
@@ -58,7 +62,7 @@ namespace FluxoCaixa.Api.Controllers
         public IActionResult Atualizar([FromBody] CaixaViewModel caixa)
         {
             _service.Atualizar(caixa);
-            return CustomResponse("Lançamento atualizado com sucesso!");
+            return Ok("Lançamento atualizado com sucesso!");
         }
         #endregion
 
@@ -67,7 +71,7 @@ namespace FluxoCaixa.Api.Controllers
         public IActionResult Excluir([FromQuery] long id)
         {
             _service.Remover(id);
-            return CustomResponse("Exclusão realizada com sucesso!");
+            return Ok("Exclusão realizada com sucesso!");
         }
         #endregion
 

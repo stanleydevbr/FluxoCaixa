@@ -1,16 +1,20 @@
 using FluxoCaixa.Api.Configuration;
 using FluxoCaixa.Domain.Notifications;
 using FluxoCaixa.Infra.Data.Context;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -28,10 +32,50 @@ namespace FluxoCaixa.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(opt => {
+            #region Autenticação
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("Total", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyMethod()
+                           //.AllowCredentials()
+                           .Build();
+                });
+            });
+
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(opt =>
+            {
+                opt.RequireHttpsMetadata = true;
+                opt.SaveToken = true;
+                opt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    RequireExpirationTime = true,
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidateLifetime = true,
+                    
+                };
+                opt.RequireHttpsMetadata = false;
+                opt.Audience = Configuration["Jwt:Audience"];
+            });
+
+            #endregion
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddMvc(opt =>
+            {
                 opt.EnableEndpointRouting = false;
                 opt.Filters.Add<NotificationFilter>();
-                });
+            });
 
             services.AddControllers(opt => opt.Filters.Add<NotificationFilter>())
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
@@ -45,7 +89,7 @@ namespace FluxoCaixa.Api
                     serializerOptions.Converters.Add(new JsonStringEnumConverter());
                     serializerOptions.Converters.Add(new DateTimeConverter());
                     //serializerOptions.Converters.Add(new DecimalJsonConverter());
-                    
+
                 });
 
             services.AddDevBrSwaggerConfiguration();
@@ -70,14 +114,21 @@ namespace FluxoCaixa.Api
                 app.UseHsts();
             }
             app.UseDevBrSwaggerConfiguration(env, provider, PREFIXO_ROTA);
-
+            app.UseRouting();
             app.UseHttpsRedirection();
 
-            app.UseRouting();
+            #region Autenticação
+            app.UseCors("Total");
+            app.UseMvc();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            #endregion
+
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers()
+                .RequireAuthorization();
             });
 
         }

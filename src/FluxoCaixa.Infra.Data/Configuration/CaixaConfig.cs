@@ -29,7 +29,7 @@ namespace FluxoCaixa.Infra.Data.Configuration
                 .IsRequired();
 
             builder.Property(x => x.DataAlteracao);
-                
+
 
         }
     }

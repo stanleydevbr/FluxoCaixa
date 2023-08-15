@@ -19,4 +19,16 @@ namespace FluxoCaixa.Api.Docs
             };
         }
     }
+
+    public class LoginExample: IExamplesProvider<LoginViewModel>
+    {
+        public LoginViewModel GetExamples()
+        {
+            return new LoginViewModel
+            {
+                Email = "stanley@gmail.com",
+                Senha = "123456"
+            };
+        }
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace FluxoCaixa.Domain.Interfaces.Repositories
 {
-    public interface ICaixaRepository : IRepositoryBase<Caixa>
+    public interface IUsuarioRepository: IRepositoryBase<Usuario>
     {
 
     }

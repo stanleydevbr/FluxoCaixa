@@ -1,4 +1,6 @@
 ﻿using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +13,9 @@ using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace FluxoCaixa.Api.Configuration
@@ -44,12 +48,15 @@ namespace FluxoCaixa.Api.Configuration
             {
                 c.OperationFilter<SwaggerDefaultValues>();
                 c.EnableAnnotations();
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                c.AddSecurityDefinition(config.Seguranca.Identificador, new OpenApiSecurityScheme
                 {
                     Description = config.Seguranca.Descricao,
-                    Name = "Authorization",
+                    Name = config.Seguranca.Autorizacao,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
+                    BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey
+                    Type = SecuritySchemeType.ApiKey,
+
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
@@ -59,9 +66,8 @@ namespace FluxoCaixa.Api.Configuration
                             Reference =  new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-
+                                Id = JwtBearerDefaults.AuthenticationScheme
+                            },
                         },
                         Array.Empty<string>()
                     }
@@ -97,10 +103,10 @@ namespace FluxoCaixa.Api.Configuration
                 .UseApiVersioning()
                 .UseMvcWithDefaultRoute();
 
-            //app.UseSwagger(options =>
-            //{
-            //    options.RouteTemplate = $"/swagger/{{documentName}}/swagger.json";
-            //});
+            app.UseSwagger(options =>
+            {
+                options.RouteTemplate = $"/swagger/{{documentName}}/swagger.json";
+            });
             app.UseSwagger();
             app.UseDefaultFiles();
             app.UseSwaggerUI(options =>
@@ -111,11 +117,31 @@ namespace FluxoCaixa.Api.Configuration
                     options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description?.GroupName?.ToLowerInvariant());
                 }
                 options.DocExpansion(DocExpansion.List);
+
             });
 
             return app;
         }
 
+    }
+
+    public class AuthResponsesOperationFilter : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            if (context != default && context.MethodInfo != default && context.MethodInfo.DeclaringType != default)
+            {
+                IEnumerable<AuthorizeAttribute> authAttributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
+                    .Union(context.MethodInfo.GetCustomAttributes(true))
+                    .OfType<AuthorizeAttribute>();
+
+                if (authAttributes.Any() && !operation.Responses.Any(r => r.Key == "401"))
+                    operation.Responses.Add("401", new OpenApiResponse { Description = "User not authenticated." });
+
+                // if (authAttributes.Any() && !operation.Responses.Any(r => r.Key == "403"))
+                //     operation.Responses.Add("403", new OpenApiResponse { Description = "User not authorized to access this endpoint." });
+            }
+        }
     }
 
 }

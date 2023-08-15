@@ -1,4 +1,6 @@
-﻿using FluxoCaixa.Domain.Interfaces.Repositories;
+﻿using FluxoCaixa.Domain.Handlers;
+using FluxoCaixa.Domain.Interfaces.Handlers;
+using FluxoCaixa.Domain.Interfaces.Repositories;
 using FluxoCaixa.Domain.Interfaces.Services;
 using FluxoCaixa.Domain.Notifications;
 using FluxoCaixa.Domain.Services;
@@ -18,6 +20,9 @@ namespace FluxoCaixa.Api.Configuration
             services.AddTransient<ICaixaService, CaixaService>();
             services.AddTransient<ICaixaRepository, CaixaRepository>();
 
+            services.AddTransient<IUsuarioService, UsuarioService>();
+            services.AddTransient<IUsuarioRepository, UsuarioRepository>();
+            services.AddTransient<IJwtHandler, JwtHandler>();
 
         }
     }
