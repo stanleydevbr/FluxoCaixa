@@ -1,6 +1,7 @@
 using FluxoCaixa.Api.Configuration;
 using FluxoCaixa.Domain.Notifications;
 using FluxoCaixa.Infra.Data.Context;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -76,6 +77,7 @@ namespace FluxoCaixa.Api
                 opt.EnableEndpointRouting = false;
                 opt.Filters.Add<NotificationFilter>();
             });
+            services.AddFluentValidationRulesToSwagger();
 
             services.AddControllers(opt => opt.Filters.Add<NotificationFilter>())
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
